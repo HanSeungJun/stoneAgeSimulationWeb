@@ -7,7 +7,12 @@
 <p align="center">
   <img src="asset/v1.0.0.png" alt="v1.0.0 UI" width="1000"/>
 </p>
+---
 
+# v1.1.0 UI
+<video controls width="600">
+  <source src="/v1.1.0.mp4" type="video/mp4">
+</video>
 ---
 
 ## 🔍 주요 기능
