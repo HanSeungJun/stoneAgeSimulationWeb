@@ -3,74 +3,97 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>juna's 시뮬레이터v1.0.0</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css"
-    integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
+  <title>juna's 시뮬레이터v1.1.0</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" integrity="sha384-rbsA2VBKQhggwzxH7pPCaAqO46MgnOM80zW1RWuH61DGLwZJEdK2Kadq2F9CUG65" crossorigin="anonymous">
   <style>
-    .card-img-custom { display: block; margin: 0 auto; width: 90px; height: 60px; object-fit: cover; cursor: pointer; }
-    .key-label { position: absolute; top: 50%; transform: translate(0, -50%); font-weight: bold; cursor: pointer; color: #333; }
-    .dashboard-container { display: flex; justify-content: center; align-items: flex-start; gap: 20px; margin-top: 20px; }
-    .sponsor-dashboard { width: 250px; }
-    .sponsor-dashboard .card-title { font-weight: bold; }
-    .sponsor-dashboard p strong { font-weight: bold; }
-    .sponsor-dashboard .list-group-item { border: none; display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; }
-    .role-btn { background: none; border: 1px solid red; border-radius: 4px; padding: 2px 6px; color: red; font-size: 0.85em; font-weight: bold; }
-    .nickname { color: #000; }
-    .ui-bg { position: relative; width: 100%; max-width: 600px; margin-left: auto; }
-    .ui-bg img { width: 100%; height: auto; display: block; }
-    #enhanceLevel-btn, #enhanceLevelNext-btn, #successProbability-btn { position: absolute; background: none; border: none; color: #fff; font-weight: bold; font-size: 1.5em; pointer-events: none; }
-    #enhanceLevel-btn { top: 66%; left: 28%; transform: translate(-50%, -50%); }
-    #enhanceLevelNext-btn { top: 66%; left: 56%; transform: translate(-50%, -50%); }
-    #successProbability-btn { top: 66%; left: 83.5%; transform: translate(-50%, -50%); }
-    #enhanceMessage { position: absolute; top: 80%; left: 52%; transform: translate(-50%, -50%); font-weight: bold; font-size: 1.5em; text-align: center; width: 400px; }
-    #potentialMessage { position: absolute; top: 16%; left: 52%; transform: translate(-50%, -50%); font-weight: bold; font-size: 1.3em; text-align: center; width: 400px; }
-    #reset-btn { position: absolute; top: 92%; left: 50%; transform: translate(-50%, -50%); pointer-events: auto; }
-    #logWindow { width: 100%; height: 200px; background-color: #f0f0f0; border: 1px solid #ccc; overflow-y: auto; font-size: 10pt; padding: 4px; margin-top: 0; }
-    .row.cards-row { display: flex; }
-    .card-equal { display: flex; flex-direction: column; width: 100%; }
-    .card-equal .card-body { flex: 1; overflow-y: auto; }
+    /* 기본 스타일 */
+    .card-img-custom { display:block; margin:0 auto; width:90px; height:60px; object-fit:cover; cursor:pointer; }
+    .key-label { position:absolute; top:50%; transform:translate(0,-50%); font-weight:bold; cursor:pointer; color:#333; }
+    /* 후원자 랭킹 */
+    .dashboard-container {
+    /* 원하는 총 너비(px)로 설정하세요 */
+    width: 1200px;
+    margin: 20px auto;      /* 화면 중앙 정렬 */
+    display: grid;
+    /* 열 너비를 px 로 고정: [후원자] 250px, [카드1] 300px, [카드2] 300px, [카드3] 300px */
+    grid-template-columns: 270px 270px 270px 270px;
+    column-gap: 20px;       /* 열 사이 간격 */
+    }
+    .sponsor-dashboard { width:250px; }
+    .sponsor-dashboard .card-body { padding:1rem; }
+    .sponsor-dashboard .card-title { font-weight:bold; margin-bottom:0.5rem; }
+    .sponsor-dashboard p strong { font-weight:bold; }
+    .sponsor-dashboard .list-group-item { border:none; display:flex; justify-content:space-between; align-items:center; padding:0.5rem 0; }
+    .role-btn { background:none; border:1px solid red; border-radius:4px; padding:2px 6px; color:red; font-size:0.85em; font-weight:bold; }
+    .nickname { color:#000; font-weight:bold; }
+    
+    /* 카드 컨테이너 너비 조정 (x축 10% 축소) */
+    .col-cash, .col-pot, .col-enh { flex: none; max-width:none; }
+    .row.cards-row { display:flex; flex-wrap:nowrap; gap:20px; }
+    .card-equal { display:flex; flex-direction:column; width:100%; }
+    .card-equal .card-body { flex:1; overflow-y:auto; }
+
+    /* 로그창 */
+    #logWindow { width:100%; height:200px; background-color:#222; border:1px solid #ccc; overflow-y:auto; font-size:10pt; padding:10px; margin:0; }
+    .log-container { width: 1180px; margin: 0 auto; }
+
+    /* UI 이미지 영역 */
+    .ui-bg { position:relative; width:100%; max-width:600px; margin:20px auto; }
+    .ui-bg img { width:100%; height:auto; display:block; }
+    #enhanceLevel-btn,#enhanceLevelNext-btn,#successProbability-btn { position:absolute; background:none; border:none; color:#fff; font-weight:bold; font-size:1.5em; pointer-events:none; }
+    #enhanceLevel-btn { top:66%; left:28%; transform:translate(-50%,-50%); }
+    #enhanceLevelNext-btn { top:66%; left:56%; transform:translate(-50%,-50%); }
+    #successProbability-btn { top:66%; left:83.5%; transform:translate(-50%,-50%); }
+    #enhanceMessage { position:absolute; top:80%; left:52%; transform:translate(-50%,-50%); font-weight:bold; font-size:1.5em; text-align:center; width:400px; }
+    #potentialMessage { position:absolute; top:16%; left:52%; transform:translate(-50%,-50%); font-weight:bold; font-size:1.3em; text-align:center; width:400px; }
+    #reset-btn { position:absolute; top: 92%; left:80%; transform:translate(-50%,-50%); font-weight:bold; font-size:1.2em; }
+
   </style>
 </head>
 <body>
-  <!-- Hero -->
+  <!-- Hero 섹션 -->
   <div class="hero d-flex align-items-center justify-content-center" style="background-color:#333;padding:20px 0">
     <div class="container text-center text-light">
-      <h1>아이템 강화 시뮬레이터 v1.0.0</h1>
+      <h1>아이템 강화 시뮬레이터 v1.1.0</h1>
       <p>커피 한잔 후원 → KB국민 933502-00-315802 한승준</p>
     </div>
   </div>
 
-  <div class="container">
-    <!-- Cards Row -->
-    <div class="row cards-row">
-      <!-- Card1 -->
-      <div class="col-md-4 d-flex">
-        <div class="card card-equal mb-4">
+  <!-- 1열: 후원자 랭킹 + 카드1~3 -->
+  <div class="dashboard-container container mt-4">
+    <!-- 후원자 랭킹 -->
+    <div class="sponsor-dashboard card">
+      <div class="card-body">
+        <h5 class="card-title">☕커피 대쉬보드</h5>
+        <br><p><strong> 🤖며리 (0_0)a <span class="role-btn"> 개발자</span></li></strong><br>개발자에게 커피를 후원하면, 대쉬보드에 올려드립니다.<br>(최소 1,000원 이상)</p>
+        <ol class="list-group list-group-numbered">
+          <li class="list-group-item bg-white"><span class="nickname">[해군]레드봇</span><span class="role-btn">회장</span></li>
+          <li class="list-group-item bg-white"><span class="nickname"></span><span class="role-btn">부회장</span></li>
+          <li class="list-group-item">&nbsp;</li>
+          <li class="list-group-item">&nbsp;</li>
+          <li class="list-group-item">&nbsp;</li>
+        </ol>
+      </div>
+    </div>
+    <!-- 카드들 -->
+    <div class="row cards-row flex-grow-1">
+      <!-- 카드1 -->
+      <div class="col-cash d-flex">
+        <div class="card card-equal">
           <div class="card-body">
-            <div style="position:relative; display:inline-block;">
-              <img src="asset/vip.png" class="card-img-custom" alt="Card1">
-            </div>
-            <h5 class="card-title mt-3">사용한 금액 : <span id="usedCost">0</span></h5>
-            <div class="mb-2 d-flex align-items-center">
-              <span class="text-muted">강화석 가격 :</span>
-              <input id="stonePriceInput" type="number" value="2500" class="form-control d-inline-block ms-2" style="width:80px;" />
-            </div>
-            <div class="mb-2 d-flex align-items-center">
-              <span class="text-muted">감정서 가격 :</span>
-              <input id="potentialPriceInput" type="number" value="8000" class="form-control d-inline-block ms-2" style="width:80px;" />
-            </div>
+            <img src="asset/vip.png" class="card-img-custom" alt="Card1">
+            <h5 class="card-title mt-3">누적 금액 : <span id="usedCost">0</span></h5>
+            <div class="mb-2 d-flex align-items-center"><span class="text-muted">강화석 가격 :</span><input id="stonePriceInput" type="number" value="2500" class="form-control d-inline-block ms-2" style="width:80px;"/></div>
+            <div class="mb-2 d-flex align-items-center"><span class="text-muted">감정서 가격 :</span><input id="potentialPriceInput" type="number" value="8000" class="form-control d-inline-block ms-2" style="width:80px;"/></div>
           </div>
         </div>
       </div>
-      <!-- Card2 -->
-      <div class="col-md-4 d-flex">
-        <div class="card card-equal mb-4">
+      <!-- 카드2 -->
+      <div class="col-pot d-flex">
+        <div class="card card-equal">
           <div class="card-body">
-            <div style="position:relative; display:inline-block;">
-              <img id="potentialImg" src="asset/potential.png" class="card-img-custom" alt="Potential">
-              <span id="potentialKey" class="key-label" style="left:100%;">(Q)</span>
-            </div>
-            <h5 class="card-title mt-3">사용한 감정서 : <span id="usedPotentialCount">0</span></h5>
+            <div style="position:relative; display:inline-block;"><img id="potentialImg" src="asset/potential.png" class="card-img-custom" alt="Potential"><span id="potentialKey" class="key-label" style="left:100%;">(Q)</span></div>
+            <h5 class="card-title mt-3">누적 감정서 : <span id="usedPotentialCount">0</span></h5>
             <h6 class="text-muted">고급(60%) : <span id="pot-count-고급">0</span></h6>
             <h6 class="text-muted">레어(30%) : <span id="pot-count-레어">0</span></h6>
             <h6 class="text-muted">유물(9%) : <span id="pot-count-유물">0</span></h6>
@@ -78,15 +101,12 @@
           </div>
         </div>
       </div>
-      <!-- Card3 -->
-      <div class="col-md-4 d-flex">
-        <div class="card card-equal mb-4">
+      <!-- 카드3 -->
+      <div class="col-enh d-flex">
+        <div class="card card-equal">
           <div class="card-body">
-            <div style="position:relative; display:inline-block;">
-              <img id="enhanceImg" src="asset/enhanceStone.png" class="card-img-custom" alt="Card3">
-              <span id="enhanceKey" class="key-label" style="left:100%;">(W)</span>
-            </div>
-            <h5 class="card-title mt-3">사용한 강화석 : <span id="usedStoneCount">0</span></h5>
+            <div style="position:relative; display:inline-block;"><img id="enhanceImg" src="asset/enhanceStone.png" class="card-img-custom" alt="Card3"><span id="enhanceKey" class="key-label" style="left:100%;">(W)</span></div>
+            <h5 class="card-title mt-3">누적 강화석 : <span id="usedStoneCount">0</span></h5>
             <h6 class="text-muted">0→1(25%) : <span id="count-0-1">0</span></h6>
             <h6 class="text-muted">1→2(20%) : <span id="count-1-2">0</span></h6>
             <h6 class="text-muted">2→3(15%) : <span id="count-2-3">0</span></h6>
@@ -101,43 +121,25 @@
         </div>
       </div>
     </div>
-    <!-- Log Window -->
+  </div>
+
+  <!-- 2열: 로그창 -->
+  <div class="log-container mt-0">
     <div class="row">
-      <div class="col-md-8">
-        <div id="logWindow"></div>
-      </div>
+      <div class="col-md-8"><div id="logWindow"></div></div>
       <div class="col-md-4"></div>
     </div>
   </div>
 
-  <!-- Dashboard + UI -->
-  <div class="dashboard-container">
-    <div class="sponsor-dashboard card mb-4">
-      <div class="card-body">
-        <h5 class="card-title">후원자 랭킹</h5>
-        <p><strong>후원자</strong><br>/ 개발자에게 커피를 후원하시면, 입금내역 기준으로 대쉬보드에 올려드립니다.</p>
-        <ol class="list-group list-group-numbered">
-          <li class="list-group-item bg-white">
-            <span class="nickname">레드봇</span> <span class="role-btn">회장</span>
-          </li>
-          <li class="list-group-item bg-white">
-            <span class="nickname">ㅇㅈㄷ</span> <span class="role-btn">부회장</span>
-          </li>
-          <li class="list-group-item">&nbsp;</li>
-          <li class="list-group-item">&nbsp;</li>
-          <li class="list-group-item">&nbsp;</li>
-        </ol>
-      </div>
-    </div>
-    <div class="ui-bg">
-      <img src="asset/itemEnhanceUI.png" alt="UI">
-      <div id="potentialMessage"></div>
-      <div id="enhanceMessage"></div>
-      <button id="reset-btn" class="btn btn-secondary">리셋(R)</button>
-      <button id="enhanceLevel-btn">0</button>
-      <button id="enhanceLevelNext-btn">1</button>
-      <button id="successProbability-btn">25%</button>
-    </div>
+  <!-- 3열: UI 이미지 -->
+  <div class="ui-bg">
+    <img src="asset/itemEnhanceUI.png" alt="UI">
+    <div id="potentialMessage"></div>
+    <div id="enhanceMessage"></div>
+    <button id="reset-btn" class="btn btn-secondary">리셋(R)</button>
+    <button id="enhanceLevel-btn">0</button>
+    <button id="enhanceLevelNext-btn">1</button>
+    <button id="successProbability-btn">25%</button>
   </div>
 
   <!-- Script -->
@@ -162,48 +164,90 @@
       const usedPotentialSpan = document.getElementById('usedPotentialCount');
       const logWindow = document.getElementById('logWindow');
       let currentLevel = 0, usedStones = 0, usedPotentials = 0;
+      
+      // ---
+      // 시도 횟수만 카운트 v1.0.0
       const attemptCounts = {'0-1':0,'1-2':0,'2-3':0,'3-4':0,'4-5':0,'5-6':0,'6-7':0,'7-8':0,'8-9':0,'9-10':0};
+      // 단계별 성공/실패도 카운트 v1.1.0
+      const enhanceSuccessCounts = {'0-1':0,'1-2':0,'2-3':0,'3-4':0,'4-5':0,'5-6':0,'6-7':0,'7-8':0,'8-9':0,'9-10':0};
+      const enhanceFailCounts    = {'0-1':0,'1-2':0,'2-3':0,'3-4':0,'4-5':0,'5-6':0,'6-7':0,'7-8':0,'8-9':0,'9-10':0};
+      // ---
+
       const potCounts = {'고급':0,'레어':0,'유물':0,'전설':0};
       const levels = {0:{success:0.25,failure:'maintain'},1:{success:0.2,failure:'maintain'},2:{success:0.15,failure:'down'},3:{success:0.1,failure:'down'},4:{success:0.01,failure:'maintain'},5:{success:1,failure:'never'},6:{success:0.3,failure:'maintain'},7:{success:0.2,failure:'down'},8:{success:0.1,failure:'down'},9:{success:0.05,failure:'down'}};
       const potentialLevels = [{name:'고급',prob:0.6,stats:{공:1,방:1,민:1,내:3},color:'green'},{name:'레어',prob:0.3,stats:{공:2,방:2,민:2,내:6},color:'yellow'},{name:'유물',prob:0.09,stats:{공:3,방:3,민:3,내:9},color:'darkorange'},{name:'전설',prob:0.01,stats:{공:6,방:6,민:6,내:18},color:'purple'}];
+
       function formatNumber(n) { return n.toLocaleString('ko-KR'); }
       function updateUI() {
+        const price = parseInt(stonePriceInput.value) || 0;
+        const potPrice = parseInt(potentialPriceInput.value) || 0;
+
+        const totalPot    = usedPotentials; // v1.1.0
+        const totalStone  = usedStones; // v1.1.0
+        
         currentBtn.innerText = currentLevel;
         nextBtn.innerText = currentLevel < 10 ? currentLevel + 1 : 'MAX';
         probBtn.innerText = currentLevel < 10 ? Math.round(levels[currentLevel].success * 100) + '%' : '-';
         usedStoneCountSpan.innerText = formatNumber(usedStones);
-        usedPotentialSpan.innerText = formatNumber(usedPotentials);
-        const price = parseInt(stonePriceInput.value) || 0;
-        const potPrice = parseInt(potentialPriceInput.value) || 0;
+        usedPotentialSpan.innerText  = formatNumber(usedPotentials)
+        usedCostSpan.innerText       = formatNumber(usedStones * price + usedPotentials * potPrice);
         usedCostSpan.innerText = formatNumber(usedStones * price + usedPotentials * potPrice);
-        for (const k in attemptCounts) document.getElementById(`count-${k}`).innerText = formatNumber(attemptCounts[k]);
-        for (const k in potCounts) document.getElementById(`pot-count-${k}`).innerText = formatNumber(potCounts[k]);
-      }
+
+        ['고급','레어','유물','전설'].forEach(name => {
+          const cnt = potCounts[name];
+          const pct = totalPot
+            ? (cnt / totalPot * 100).toFixed(1)
+            : 0;
+          document.getElementById(`pot-count-${name}`)
+            .innerText = `${cnt} (${pct}%)`;
+        });
+
+
+  //  v1.1.0: 단계별 실제 성공률 = success/(success+failure)
+  Object.keys(enhanceSuccessCounts).forEach(key => {
+    const succ = enhanceSuccessCounts[key];
+    const fail = enhanceFailCounts[key];
+    const tot = succ + fail;
+    const pct = tot ? (succ / tot * 100).toFixed(1) : 0;
+    document.getElementById(`count-${key}`).innerText = `${tot} (${pct}%)`;
+  });
+}
       function appendLog(text, color) {
         const entry = document.createElement('div');
         entry.textContent = text;
         entry.style.color = color;
-        entry.style.fontSize = '10pt';
+        entry.style.fontSize = '14pt';
         logWindow.appendChild(entry);
         logWindow.scrollTop = logWindow.scrollHeight;
       }
+      
+      // crypto 기반 0 ≤ r < 1 난수 생성기
+      function getRandom() {
+      const arr = new Uint32Array(1);
+      window.crypto.getRandomValues(arr);
+      return arr[0] / (0xFFFFFFFF + 1);
+      }
+
       function doEnhance() {
         if (currentLevel >= 10) return;
         usedStones++; const key = `${currentLevel}-${currentLevel+1}`; attemptCounts[key]++;
         const {success, failure} = levels[currentLevel];
         let resultMsg, clr;
-        if (Math.random() < success) {
+        const r = getRandom();
+        if ( r < success) {
           currentLevel++; successAudio.play(); resultMsg = '아이템 강화에 성공하였습니다.'; clr = 'skyblue';
+          enhanceSuccessCounts[key]++; // 성공 카운트
         } else {
           failAudio.play(); resultMsg = '아이템 강화에 실패하였습니다.'; clr = 'red';
           if (failure === 'down') currentLevel = Math.max(0, currentLevel - 1);
+          enhanceFailCounts[key]++; // 실패 카운트트
         }
         messageDiv.innerText = resultMsg; messageDiv.style.color = clr;
         appendLog(resultMsg, clr);
         updateUI();
       }
       function doPotential() {
-        const r = Math.random(); let sum = 0, chosen;
+        const r = getRandom(); let sum = 0, chosen;
         for (const lvl of potentialLevels) { sum += lvl.prob; if (r < sum) { chosen = lvl; break; } }
         usedPotentials++; potCounts[chosen.name]++;
         const resultMsg = `아이템이 (${chosen.name}) 등급으로 변경되었습니다. (추가 능력치 공+${chosen.stats.공}, 방+${chosen.stats.방}, 민+${chosen.stats.민}, 내+${chosen.stats.내})`;
