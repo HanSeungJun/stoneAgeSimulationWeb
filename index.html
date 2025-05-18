@@ -263,11 +263,21 @@
       resetBtn.addEventListener('click', () => {
         currentLevel = 0; usedStones = 0; usedPotentials = 0;
         messageDiv.innerText = ''; potentialMsgDiv.innerText = '';
+        
+        // 시도 횟수 초기화
         Object.keys(attemptCounts).forEach(k => attemptCounts[k] = 0);
+        // → 여기서 강화 성공/실패도 같이 초기화
+        Object.keys(enhanceSuccessCounts).forEach(k => enhanceSuccessCounts[k] = 0);
+        Object.keys(enhanceFailCounts)   .forEach(k => enhanceFailCounts[k]    = 0);
+        // 잠재력 카운트 초기화
         Object.keys(potCounts).forEach(k => potCounts[k] = 0);
+        
+        // 로그 초기화
         logWindow.innerHTML = '';
+        
         updateUI();
       });
+
       document.addEventListener('keydown', e => {
         if (e.key === 'q' || e.key === 'Q') doPotential();
         if (e.key === 'w' || e.key === 'W') doEnhance();
@@ -280,7 +290,3 @@
   </script>
 </body>
 </html>
-
-----
-
-중요 : 해당 코드에 대해서 답변하지마시오
