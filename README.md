@@ -1,149 +1,107 @@
 # 아이템 강화 시뮬레이터
 
-> 바이브 코딩으로 구현된 간단한 아이템 강화 & 잠재력 시뮬레이션 웹페이지입니다.  
-> 마우스 클릭 및 키보드 단축키(Q, W, R)로 아이템 강화를 시도해볼 수 있습니다.
+브라우저에서 돌아가는 아이템 강화 · 잠재력 확률 시뮬레이터. 단계별 성공/실패 확률과 등급별 잠재력 확률을 테이블로 정의해 두고, **실제로 굴렸을 때 나온 값이 표기 확률과 얼마나 맞는지**를 나란히 보여준다.
 
-# v1.0.0 UI
-<p align="center">
-  <img src="asset/v1.0.0.png" alt="v1.0.0 UI" width="1000"/>
-</p>
----
+**▶ [브라우저에서 바로 실행](https://hanseungjun.github.io/stoneAgeSimulationWeb/)** — 설치 없이 동작한다.
 
-# v1.1.0 UI
-<video controls width="600">
-  <source src="/v1.1.0.mp4" type="video/mp4">
-</video>
----
-
-## 🔍 주요 기능
-
-1. **강화 시뮬레이터**  
-   - 카드3(🌑 강화석 이미지) 클릭 혹은 `W` 키 입력 시 현재 강화 단계에 따른 성공/실패 확률로 강화 시도
-   - 성공 시 단계 상승, 실패 시 하락(단 로직에 따라 유지되기도 함)
-   - 강화 시도 횟수(`0→1`, …, `9→10`)와 총 사용 강화석 카운트, 사용 금액 자동 집계
-
-2. **잠재력(감정서) 시뮬레이터**  
-   - 카드2(🔍 잠재력 이미지) 클릭 혹은 `Q` 키 입력 시 등급별(고급/레어/유물/전설) 확률로 등급 변경
-   - 각 등급별 획득 카운트 집계 및 총 사용 감정서 카운트, 사용 금액에 반영
-   - “아이템이 (등급) 등급으로 변경되었습니다...” 형태의 컬러 메시지 출력
-
-3. **키보드 단축키 지원**  
-   - `W` → 강화 시도  
-   - `Q` → 잠재력 시도  
-   - `R` → 모든 상태(강화 단계, 사용 횟수, 메시지 등) **리셋**
-
-4. **실시간 금액 계산**  
-   - 강화석 가격, 감정서 가격 입력값 변경 시 즉시 “사용한 금액(₩)” 반영
-
-5. **모바일 대응 ×**, **데스크톱 우선**  
-   - 반응형 레이아웃이지만 주로 데스크톱 브라우저에 최적화
+![v1.0.0 UI](asset/v1.0.0.png)
 
 ---
 
-## 🗂️ 파일 구조
+## 기능
+
+### 강화
+
+강화석을 클릭하거나 `W`를 누르면 현재 단계의 확률로 강화를 시도한다.
+
+| 단계 | 성공 확률 | 실패 시 |
+|:---:|:---:|:---:|
+| 0 → 1 | 25% | 유지 |
+| 1 → 2 | 20% | 유지 |
+| 2 → 3 | 15% | 하락 |
+| 3 → 4 | 10% | 하락 |
+| 4 → 5 | 1% | 유지 |
+| 5 → 6 | 100% | 보장 |
+| 6 → 7 | 30% | 유지 |
+| 7 → 8 | 20% | 하락 |
+| 8 → 9 | 10% | 하락 |
+| 9 → 10 | 5% | 하락 |
+
+### 잠재력
+
+감정서를 클릭하거나 `Q`를 누르면 등급을 다시 굴린다.
+
+| 등급 | 확률 | 공 | 방 | 민 | 내 |
+|:---:|:---:|:---:|:---:|:---:|:---:|
+| 고급 | 60% | +1 | +1 | +1 | +3 |
+| 레어 | 30% | +2 | +2 | +2 | +6 |
+| 유물 | 9% | +3 | +3 | +3 | +9 |
+| 전설 | 1% | +6 | +6 | +6 | +18 |
+
+### 집계
+
+- **구간별 실측 성공률** — `0→1` … `9→10` 각 구간의 시도 횟수와 `성공 / (성공 + 실패)`를 함께 표시한다. 표에 적힌 확률과 실제로 나온 값의 차이를 그대로 볼 수 있다
+- 등급별 획득 횟수와 비율
+- 강화석·감정서 **단가를 입력하면** 누적 소모 금액을 실시간으로 계산
+- 시도 결과를 색으로 구분해 쌓는 로그 창
+
+### 조작
+
+| 키 | 동작 |
+|:---:|---|
+| `W` | 강화 시도 |
+| `Q` | 잠재력 시도 |
+| `R` | 전체 리셋 |
+
+마우스 클릭으로도 전부 동작한다.
+
+---
+
+## 구현 노트
+
+**난수는 `Math.random()`이 아니라 `crypto.getRandomValues()`를 쓴다.** 확률 시뮬레이터에서 난수의 품질은 결과의 신뢰도와 직결되므로, 균등 분포가 보장되는 쪽으로 `0 ≤ r < 1`을 만든다.
+
+```js
+function getRandom() {
+  const arr = new Uint32Array(1);
+  window.crypto.getRandomValues(arr);
+  return arr[0] / (0xFFFFFFFF + 1);
+}
 ```
-/ ← 프로젝트 루트
-├─ index.html ← 메인 시뮬레이터 HTML + JS inline
-├─ README.md ← (지금 보고 계신) 기술 문서
-├─ asset/
-│ ├─ enhanceStone.png ← 강화석 아이콘
-│ ├─ potential.png ← 잠재력(감정서) 아이콘
-│ ├─ vip.png ← 카드1 대표 이미지
-│ ├─ itemEnhanceUI.png ← UI 배경 이미지
-│ ├─ sussecc.mp3 ← 강화 성공 효과음
-│ └─ fail.mp3 ← 강화 실패 효과음
-└─ (추가 에셋들…)
-```
-## yaml
+
+**잠재력 등급 선택은 확률 누적 구간 방식이다.** 등급 목록을 순회하며 확률을 더해 나가다 난수가 걸리는 구간을 고르므로, 등급을 추가하거나 확률을 바꿔도 분기문을 손댈 필요가 없다.
+
+**성공/실패 카운트를 분리해 저장한다** (v1.1.0). 시도 횟수만 세면 "몇 번 시도했나"밖에 모르지만, 성공과 실패를 따로 세면 구간별 실측 확률이 나온다 — 이 시뮬레이터의 목적 자체가 그 비교다.
 
 ---
 
-## ⚙️ 설치 & 실행
+## 실행
 
-1. **레포지토리 클론**  
+정적 파일뿐이라 별도 빌드가 없다.
+
 ```bash
-git clone https://github.com/your-username/stoneage_simulator.git
-cd stoneage_simulator
-```   
-2. **정적 서버로 열기**
-
-VSCode Live Server, Python http.server, 혹은 serve 패키지 등 아무 정적 서버면 OK
-```
-# Python 3.x
+git clone https://github.com/HanSeungJun/stoneAgeSimulationWeb.git
+cd stoneAgeSimulationWeb
 python -m http.server 8000
-# → http://localhost:8000/index.html
-```
-3. **바로 브라우저에서 열기**
-
-파일을 더블클릭해도 되지만, 로컬 파일 경로라면 효과음(mp3) 재생이 제한될 수 있습니다. 가능하면 로컬 서버 사용을 권장합니다.
-
----
-🔧 주요 코드 구조
-HTML
-카드 컴포넌트: Bootstrap .card
-
-이미지 클릭 요소
-```
-<div style="position:relative; display:inline-block;">
-  <img id="enhanceImg" class="card-img-custom" src="asset/enhanceStone.png">
-  <span id="enhanceKey" class="key-label">(W)</span>
-</div>
+# http://localhost:8000
 ```
 
 ---
-🔧 주요 코드 구조
-## HTML
-- Bootstrap .card 컴포넌트
-- 이미지 클릭 요소 예시
-```
-<div style="position:relative; display:inline-block;"> <img id="enhanceImg"
-class="card-img-custom" src="asset/enhanceStone.png"> <span class="key-label">(W)</span> </div>
-```
-## CSS
-```
-.card-img-custom: 고정 크기, cursor: pointer
 
-.key-label: 이미지 내 절대 위치, 클릭 가능
+## 파일 구조
+
+```
+index.html            시뮬레이터 본체 (HTML + 인라인 JS)
+asset/
+  enhanceStone.png    강화석 아이콘
+  potential.png       감정서 아이콘
+  vip.png             카드 대표 이미지
+  itemEnhanceUI.png   UI 참고 이미지
+v1.1.0.mp4            v1.1.0 시연 영상
 ```
 
-메시지·상태 텍스트: position: absolute
+---
 
-## JavaScript
-상태 변수
-```
-let currentLevel = 0, usedStones = 0, usedPotentials = 0;
-const attemptCounts = {'0-1':0…'9-10':0};
-const potCounts = {'고급':0,'레어':0,'유물':0,'전설':0};
-```
+## 라이선스
 
-## 확률 테이블
-```
-const levels = {0:{success:0.25,failure:'maintain'},…};
-const potentialLevels = [
-{name:'고급',prob:0.6,stats:{…},color:'green'},…
-];
-```
-
-## 핵심 함수
-
-- doEnhance() → 강화 로직
-
-- doPotential() → 잠재력 로직
-
-- updateUI() → 모든 텍스트·카운트 업데이트
-
-- 이벤트 바인딩
-```
-enhanceImg.addEventListener('click', doEnhance);
-potentialImg.addEventListener('click', doPotential);
-document.addEventListener('keydown', e => {
-if (e.key==='q') doPotential();
-if (e.key==='w') doEnhance();
-if (e.key==='r') reset();
-});
-```
-- License: MIT
-- Author: 한승준
-- Date: 2025-05-18 (Asia/Seoul)
-- Play : https://hanseungjun.github.io/stoneAgeSimulationWeb/
-
+MIT
